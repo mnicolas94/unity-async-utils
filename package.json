@@ -5,7 +5,9 @@
   "description": "Utilities to work with async functions",
   "unity": "2021.1",
   "unityRelease": "",
-  "dependencies": {},
+  "dependencies": {
+    "com.facticus.utils": "0.9.1"
+  },
   "keywords": [],
   "author": {
     "name": "Facticus",
