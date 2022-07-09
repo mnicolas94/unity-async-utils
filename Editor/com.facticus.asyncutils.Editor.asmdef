@@ -1,5 +1,5 @@
 {
-    "name": "com.{{COMPANY}}.{{REPOSITORY_NAME}}.Editor",
+    "name": "com.facticus.asyncutils.Editor",
     "references": [],
     "includePlatforms": [
         "Editor"

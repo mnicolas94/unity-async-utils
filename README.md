@@ -1,6 +1,6 @@
-# {{FRIENDLY_NAME}}
+# Async utils
 
-{{DESCRIPTION}}
+Utilities to work with async functions
 
 ## License
 
