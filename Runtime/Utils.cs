@@ -1,7 +1,8 @@
 ﻿﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine.InputSystem;
+ using UnityEngine;
+ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Utils.Input;
 
@@ -9,6 +10,27 @@ namespace AsyncUtils
 {
     public static class Utils
     {
+        /// <summary>
+        /// Cross-platform delay that works on WebGL builds
+        /// </summary>
+        /// <param name="seconds"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public static async Task Delay(float seconds, CancellationToken ct)
+        {
+#if UNITY_WEBGL
+            var start = Time.realtimeSinceStartup;
+            var stop = start + seconds;
+            while (Time.realtimeSinceStartup < stop && !ct.IsCancellationRequested)
+            {
+                await Task.Yield();
+            }
+#else
+            int waitMillis = (int) (seconds * 1000);
+            await Task.Delay(waitMillis, ct);
+#endif
+        }
+        
         public static async Task<T> NeverEndTaskAsync<T>(CancellationToken ct)
         {
             while (!ct.IsCancellationRequested)
