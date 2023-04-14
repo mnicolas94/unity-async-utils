@@ -25,28 +25,28 @@ namespace AsyncUtils
             _cts.Dispose();
         }
 
-        public void LaunchPopup(AsyncPopup popup)
+        public async void LaunchPopup(AsyncPopup popup)
         {
             var ct = _cts.Token;
-            Popups.ShowPopup(popup, ct);
+            await Popups.ShowPopup(popup, ct);
         }
         
-        public void LaunchPopup<T, TD>(AsyncPopup<T, TD> popup, TD data)
+        public async void LaunchPopup<T, TD>(AsyncPopup<T, TD> popup, TD data)
         {
             var ct = _cts.Token;
-            Popups.ShowPopup(popup, data, ct);
+            await Popups.ShowPopup(popup, data, ct);
         }
         
-        public void LaunchPopup<TD>(AsyncPopupInitializable<TD> popup, TD data)
+        public async void LaunchPopup<TD>(AsyncPopupInitializable<TD> popup, TD data)
         {
             var ct = _cts.Token;
-            Popups.ShowPopup(popup, data, ct);
+            await Popups.ShowPopup(popup, data, ct);
         }
 
-        public void LaunchPopup<T>(AsyncPopupReturnable<T> popup)
+        public async void LaunchPopup<T>(AsyncPopupReturnable<T> popup)
         {
             var ct = _cts.Token;
-            Popups.ShowPopup(popup, ct);
+            await Popups.ShowPopup(popup, ct);
         }
     }
 }
