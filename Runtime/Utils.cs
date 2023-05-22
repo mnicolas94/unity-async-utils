@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
  using UnityEngine;
+ using UnityEngine.Events;
  using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Utils.Input;
@@ -155,6 +156,29 @@ namespace AsyncUtils
             finally
             {
                 inputAction.performed -= OnPerformedAction;
+            }
+        }
+        
+        public static async Task WaitUnityEventAsync(UnityEvent evt, CancellationToken ct)
+        {
+            bool isTriggered = false;
+            void TriggeredAction()
+            {
+                isTriggered = true;
+            }
+        
+            try
+            {
+                evt.AddListener(TriggeredAction);
+                    
+                while (!isTriggered && !ct.IsCancellationRequested)
+                {
+                    await Task.Yield();
+                }
+            }
+            finally
+            {
+                evt.RemoveListener(TriggeredAction);
             }
         }
     }
