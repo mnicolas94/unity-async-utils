@@ -4,7 +4,7 @@ using UnityEngine;
 namespace AsyncUtils
 {
     /// <summary>
-    /// Component to facilitate popups creation with UnityEvents
+    /// Component to facilitate popups instantiation with UnityEvents
     /// </summary>
     public class PopupLauncher : MonoBehaviour
     {
