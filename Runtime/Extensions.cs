@@ -1,13 +1,14 @@
-﻿﻿using System.Threading.Tasks;
+﻿﻿using System.Threading;
+ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace AsyncUtils
 {
     public static class Extensions
     {
-        public static async Task AwaitAsync(this AsyncOperation operation)
+        public static async Task AwaitAsync(this AsyncOperation operation, CancellationToken ct)
         {
-            while (!operation.isDone)
+            while (!operation.isDone && !ct.IsCancellationRequested)
             {
                 await Task.Yield();
             }
