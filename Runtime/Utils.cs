@@ -1,4 +1,5 @@
-﻿﻿using System.Linq;
+﻿﻿using System;
+ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
  using UnityEngine;
@@ -40,6 +41,35 @@ namespace AsyncUtils
             }
 
             return default;
+        }
+
+        /// <summary>
+        /// Get the first task to finish among several ones and cancel the others. The goal of this functions is to
+        /// reduce nesting produced by the try-finally block needed to properly cancel and dispose the linked
+        /// cancellation token source.
+        /// Common usage:
+        ///     var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        ///     var linkedCt = linkedCts.Token;
+        ///
+        ///     Task task1 = Task1(linkedCt);
+        ///     Task task2 = Task2(linkedCt);
+        ///     var finishedTask = await GetFirstToFinish(linkedCts, task1, task2);
+        /// </summary>
+        /// <param name="linkedCts"></param>
+        /// <param name="tasks"></param>
+        /// <returns></returns>
+        public static async Task<Task> GetFirstToFinish(CancellationTokenSource linkedCts, params Task[] tasks)
+        {
+            try
+            {
+                var finishedTask = await Task.WhenAny(tasks);
+                return finishedTask;
+            }
+            finally
+            {
+                linkedCts.Cancel();
+                linkedCts.Dispose();
+            }
         }
         
         public static async Task<Button> WaitFirstButtonPressedAsync(CancellationToken ct, params Button[] buttons)
