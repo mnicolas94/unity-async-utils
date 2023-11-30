@@ -72,6 +72,64 @@ namespace AsyncUtils
             }
         }
         
+        /// <summary>
+        /// Wait for the first task to finish, execute a corresponding callback and cancel the remaining tasks.
+        /// The goal of this functions is to reduce nesting produced by the try-finally block needed to properly cancel
+        /// and dispose the linked cancellation token source.
+        /// Common usage:
+        ///     CancellationToken ct = ...
+        ///     await WaitFirstToFinish(ct,
+        ///         (
+        ///             linkedCt => Task1(linkedCt);,
+        ///             task1 =>
+        ///             {
+        ///                 // do something
+        ///             }
+        ///         ),
+        ///         (
+        ///             linkedCt => Task2(linkedCt),
+        ///             task2 =>
+        ///             {
+        ///                 // do something
+        ///             }
+        ///         )
+        ///     );
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <param name="tasksAndResults"></param>
+        public static async Task WaitFirstToFinish(CancellationToken ct,
+            params (Func<CancellationToken, Task>, Action<Task>)[] tasksAndResults)
+        {
+            var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            var linkedCt = linkedCts.Token;
+
+            async Task<(Task, Action<Task>)> WrappedTask(Func<CancellationToken, Task> taskCreator,
+                Action<Task> resultFunction)
+            {
+                var task = taskCreator(linkedCt);
+                await task;
+                return (task, resultFunction);
+            }
+            
+            try
+            {
+                var tasks = tasksAndResults.Select(tuple =>
+                {
+                    var (taskCreator, resultFunction) = tuple;
+                    return WrappedTask(taskCreator, resultFunction);
+                });
+                
+                var finishedWrappedTask = await Task.WhenAny(tasks);
+                var (finishedTask, resultFunction) = await finishedWrappedTask;
+                resultFunction?.Invoke(finishedTask);
+            }
+            finally
+            {
+                linkedCts.Cancel();
+                linkedCts.Dispose();
+            }
+        }
+        
         public static async Task<Button> WaitFirstButtonPressedAsync(CancellationToken ct, params Button[] buttons)
         {
             var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
