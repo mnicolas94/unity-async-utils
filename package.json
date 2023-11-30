@@ -1,6 +1,6 @@
 {
   "name": "com.facticus.asyncutils",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "displayName": "Async utils",
   "description": "Utilities to work with async functions",
   "unity": "2021.1",
