@@ -2,6 +2,7 @@
  using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+ using Codice.Client.BaseCommands;
  using UnityEngine;
  using UnityEngine.Events;
  using UnityEngine.InputSystem;
@@ -132,11 +133,21 @@ namespace AsyncUtils
         
         public static async Task<Button> WaitFirstButtonPressedAsync(CancellationToken ct, params Button[] buttons)
         {
+            // return early if all buttons are null
+            var areAllNull = buttons.All(button => button == null);
+            if (areAllNull)
+            {
+                return null;
+            }
+            
             var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            var linkedCt = linkedCts.Token;
+            
             try
             {
-                var linkedCt = linkedCts.Token;
-                var tasks = buttons.Select(button => WaitPressButtonAsync(button, linkedCt));
+                var tasks = buttons
+                    .Where(button => button != null)
+                    .Select(button => WaitPressButtonAsync(button, linkedCt));
                 var finishedTask = await Task.WhenAny(tasks);
 
                 await finishedTask;  // propagate exception if the task finished because of it
