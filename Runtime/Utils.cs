@@ -74,7 +74,7 @@ namespace AsyncUtils
         
         /// <summary>
         /// Wait for the first task to finish, execute a corresponding callback and cancel the remaining tasks.
-        /// The goal of this functions is to reduce nesting produced by the try-finally block needed to properly cancel
+        /// The goal of these functions is to reduce nesting produced by the try-finally block needed to properly cancel
         /// and dispose the linked cancellation token source.
         /// Common usage:
         ///     CancellationToken ct = ...
